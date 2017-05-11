@@ -260,7 +260,7 @@ def send_message(recipient_id, message_text):
 
 def find_in_db_attributes(response, keyToFind):
     for item in response["Attributes"]:
-        if item["Name"] == keyToFind:
+        if item["Name"].lower() == keyToFind.lower():
             return item
         else:
             return None
@@ -276,8 +276,9 @@ def send_candy_options(recipient_id, category):
     for candy_name in candyCategory[category]:
         db_candy = find_in_db_attributes(response, candy_name)
         if db_candy is None:
-            send_message(sender_id, "We're sorry, we're all out of " + category + " candies.")
-            send_quick_reply(sender_id, {})
+            send_message(recipient_id, "We're sorry, we're all out of " + category + " candies.")
+            send_quick_reply(recipient_id, {})
+            return
         db_candy_name = db_candy["Name"]
         if candy_name.lower() == db_candy_name and int(db_candy["Value"]) > 0:
             available_candies[candy_name] = category
