@@ -259,6 +259,8 @@ def send_message(recipient_id, message_text):
         log(r.text)
 
 def find_in_db_attributes(response, keyToFind):
+    log("find_in_db_attributes: " + keyToFind)
+    log(response["Attributes"])
     for item in response["Attributes"]:
         if item["Name"].lower() == keyToFind.lower():
             return item
