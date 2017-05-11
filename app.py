@@ -253,7 +253,7 @@ def send_message(recipient_id, message_text):
 
 def find_in_db_attributes(response, keyToFind):
     for item in response["Attributes"]:
-        if item["Name"] == keyToFind:
+        if item["Name"].lower() == keyToFind.lower():
             return item
         else:
             return None
