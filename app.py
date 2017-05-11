@@ -11,16 +11,16 @@ app = Flask(__name__)
 bot = Bot("EAAD0GgditLsBAEOaCmRSpSHZCcer6BsGNizdj0KPiodpsNWK1a76s9GBDfiUk5uPVWKqOdEM3WnAeJSGQs68tYA4obE56pRCr7GvQr1B7E6W6giAxEIQxZBA7ZA0HVkrtoj3NiOHT1JZCqvDzRcfFVfk87MbVWpowF0H1mEOogZDZD")#Bot(os.environ["PAGE_ACCESS_TOKEN"])
 
 chocolateDict = {
-    "snickers",
-    "M&M",
+    "Kit Kat",
+    "Rollo",
     "Twix",
     "Hershey"
 }
 
 fruityDict = {
-    "jolly rancher",
-    "fruit loops",
-    "fruity pebbles"
+    "Starburst",
+    "Smarties",
+    "Blow Pops"
 }
 
 candyCategory = {
@@ -107,18 +107,9 @@ def webhook():
                             num_available_candies = int(candy["Value"])
                             candy_found = num_available_candies > 0
                         if candy_found:
-                            log("found candy: ")
-                            log(candy)
-                            candy["Value"] =  str(num_available_candies - 1)
-                            candy["Replace"] = True
-                            candyDb["Attributes"] = response["Attributes"]
-                            sdb.batch_put_attributes(
-                                DomainName = domainName,
-                                Items = [candyDb]
-                            )
+                            decrement_candies(candy, num_available_candies, response)
                             user_info = get_user_info(sender_id)
-                            candy_request = {"senderId": sender_id, "choice": message_text, "name": user_info['first_name'] + " " + user_info['last_name']}
-                            r = requests.post("https://iimhlox1ml.execute-api.us-east-1.amazonaws.com/hackathon/candy-request?requestId=gibberish", data=json.dumps(candy_request))
+                            send_candy_sample_request(sender_id, message_text, user_info)
                             send_message(sender_id, "Thank you for choosing to sample " + message_text + ". Be prepared for freaky fast (but leagally distinct) delivery")
                         elif pending_review_found:
                             return "ok", 200
@@ -196,6 +187,22 @@ def solicit_review():
     ]
     bot.send_message(sender_id, {"text": request_message, "quick_replies": quick_replies})
     return "ok", 200
+
+def decrement_candies(candy, num_available_candies, response):
+    log("found candy: ")
+    log(candy)
+    candy["Value"] =  str(num_available_candies - 1)
+    candy["Replace"] = True
+    candyDb["Attributes"] = response["Attributes"]
+    sdb.batch_put_attributes(
+        DomainName = domainName,
+        Items = [candyDb]
+    )
+
+def send_candy_sample_request(sender_id, message_text, user_info):
+    candy_request = {"senderId": sender_id, "choice": message_text, "name": user_info['first_name'] + " " + user_info['last_name']}
+    r = requests.post("https://iimhlox1ml.execute-api.us-east-1.amazonaws.com/hackathon/candy-request?requestId=gibberish", data=json.dumps(candy_request))
+
 
 def get_user_info(sender_id):
     url = "https://graph.facebook.com/v2.6/" + sender_id + "?fields=first_name,last_name,profile_pic,locale,timezone,gender&access_token=EAAD0GgditLsBADZAkcimL0Geyg9r9VyGFvCGoVFm5YhNlZCw3fliqbqXZB5lWnNJnGSm5oMLZCZBZCuRSHqHMgyBimmDl09MVZCcOAmnspRxsGYVTqIsleWogSAeaWvQXDcmr7rqlZAW962UgdgEwTNrDaTTqhQHqhas1I3KcYwRxwZDZD"
