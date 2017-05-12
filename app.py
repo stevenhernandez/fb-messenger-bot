@@ -37,7 +37,7 @@ newReviewActions = {
 }
 
 cdv = [
-    ("Are  you still craving candy?", {"Yes", "No"}),
+    ("Are you still craving candy?", {"Yes", "No"}),
     ("Will you vote for the CandyCrew to win the Hackathon?", { "Yes", "Definitely!"})
 ]
 
@@ -121,7 +121,6 @@ def webhook():
                                 bot.send_message(sender_id, options)
                             elif message_text == "Complete Review":
                                 if "Attributes" in pendingReviewsDb:
-                                     Thanks for your honest review.  We will ping you when other exclusive offers are available.
                                     send_message(sender_id, "Thanks for your honest review.  We will ping you when other exclusive offers are available.")
                                     sdb.delete_attributes(
                                         DomainName = domainName,
