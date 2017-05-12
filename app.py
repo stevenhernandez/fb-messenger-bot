@@ -42,7 +42,7 @@ newReviewActions = {
 }
 
 cdv = [
-    ("Was your candy large enough", { "Yes", "No"}),
+    ("Was your candy large enough?", { "Yes", "No"}),
     ("Will you vote for team SCRUB to win the Hackathon?", { "Yes", "Definitely!"})
 ]
 
@@ -88,6 +88,7 @@ def webhook():
 
                     if "text" in messaging_event["message"]:
                         message_text = messaging_event["message"]["text"]  # the message's text
+                        log("message text: " + message_text)
 
                         if message_text in candyCategory:
                             send_candy_options(sender_id, message_text)
@@ -108,6 +109,8 @@ def webhook():
                                 bot.send_message(sender_id, options)
                         elif message_text in newReviewActions:
                             if message_text == "Continue Review":
+                                if "Attributes" not in pendingReviewsDb:
+                                    continue
                                 reviewQuestionPlace = int(pendingReviewsDb["Attributes"][0]["Value"])
                                 options = build_quick_replies_from_dict(
                                     cdv[reviewQuestionPlace][1],
@@ -140,11 +143,11 @@ def webhook():
                             decrement_candies(candy, candyDb, num_available_candies, response)
                             user_info = get_user_info(sender_id)
                             send_candy_sample_request(sender_id, message_text, user_info)
-                            send_message(sender_id, "Thank you for choosing to sample " + message_text + ". Be prepared for freaky fast (but leagally distinct) delivery\nNo need to provide address https://i.imgflip.com/1ou13m.jpg")
+                            send_message(sender_id, "Thank you for choosing to sample " + message_text + ". Be prepared for freaky fast (but leagally distinct) delivery.\nNo need to provide your address https://i.imgflip.com/1ou13m.jpg")
                         elif pending_review_found:
                             options = build_quick_replies_from_dict(
                                 newReviewActions,
-                                "Thank you for your review, we will include that with your previous responses"
+                                "Thanks, we will include that with your previous responses!"
                             )
                             bot.send_message(sender_id, options)
                             return "ok", 200
