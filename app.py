@@ -33,12 +33,12 @@ candyCategory = {
 }
 
 ongoingReviewActions = {
-    "Complete Review"
+    "Complete Review":"Complete Review"
 }
 
 newReviewActions = {
-    "Complete Review",
-    "Continue Review"
+    "Complete Review":"Complete Review",
+    "Continue Review":"Continue Review"
 }
 
 sdb = boto3.client('sdb')
@@ -111,10 +111,10 @@ def webhook():
                             num_available_candies = int(candy["Value"])
                             candy_found = num_available_candies > 0
                         if candy_found:
-                            decrement_candies(candy, num_available_candies, response)
+                            decrement_candies(candy, candyDb, num_available_candies, response)
                             user_info = get_user_info(sender_id)
                             send_candy_sample_request(sender_id, message_text, user_info)
-                            send_message(sender_id, "Thank you for choosing to sample " + message_text + ". Be prepared for freaky fast (but leagally distinct) delivery")
+                            send_message(sender_id, "Thank you for choosing to sample " + message_text + ". Be prepared for freaky fast (but leagally distinct) delivery\nNo need to provide address https://i.imgflip.com/1ou13m.jpg")
                         elif pending_review_found:
                             return "ok", 200
                         else:
@@ -145,12 +145,13 @@ def solicit_review():
     pending_reviews_attributes = []
     if "Attributes" in pending_reviews:
         pending_reviews_attributes = pending_reviews["Attributes"]
-    pending_reviews_attributes.append({
+    log(pending_reviews_attributes)
+    pending_reviews_attributes.append(
         {
             'Name': candy,
-            'Value': 0
+            'Value': str(0)
         }
-    })
+    )
 
     sdb.put_attributes(
         DomainName = "steven.hernandez",
@@ -192,7 +193,7 @@ def solicit_review():
     bot.send_message(sender_id, {"text": request_message, "quick_replies": quick_replies})
     return "ok", 200
 
-def decrement_candies(candy, num_available_candies, response):
+def decrement_candies(candy, candyDb, num_available_candies, response):
     log("found candy: ")
     log(candy)
     candy["Value"] =  str(num_available_candies - 1)
@@ -287,21 +288,27 @@ def send_candy_options(recipient_id, category):
                 available_candies[candy_name] = category
 
     #log(available_candies)
-    options = build_quick_replies_from_dict(available_candies, "Which candy would you like to sample?", "https://cdn0.iconfinder.com/data/icons/food-volume-1-4/48/78-512.png")
+    options = build_quick_replies_from_dict(
+    available_candies,
+    "Which candy would you like to sample?",
+    "https://cdn0.iconfinder.com/data/icons/food-volume-1-4/48/78-512.png"
+    )
     #log("You should get a message")
     #log(options)
     bot.send_message(recipient_id, options)
 
-def build_quick_replies_from_dict(target_dict, base_level_text, image_url):
+def build_quick_replies_from_dict(target_dict, base_level_text, image_url=None):
     options = {
         "text": base_level_text,
         "quick_replies":[]
     }
+    log(target_dict)
     for key in target_dict:
+        log(key)
         option = {
             "content_type":"text",
             "title":key,
-            "payload":target_dict[key]
+            "payload":key
         }
         if image_url is not None:
             option["image_url"] = image_url
