@@ -294,7 +294,7 @@ def send_quick_reply(recipient_id, options):
         greeting += "Ms. " + info["last_name"]
 
     options = {
-        "text": greeting + "\nWelcome to BV Sampling!\nWhich type of candy do you typically prefer?",
+        "text": "Hi " + info["first name"] + ", Thank you for joining the TryIt Community.  We know you have a sweet tooth, and want you to be one of the first people to try the latest Candy for 2018.  In exchange we would love to hear what you think after trying the Candy.  What type of candy do you want to try?",
         "quick_replies":[]
     }
     for key in candyCategory:
