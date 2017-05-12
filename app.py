@@ -37,8 +37,8 @@ newReviewActions = {
 }
 
 cdv = [
-    ("Was your candy large enough?", { "Yes", "No"}),
-    ("Will you vote for team SCRUB to win the Hackathon?", { "Yes", "Definitely!"})
+    ("Are  you still craving candy?", {"Yes", "No"}),
+    ("Will you vote for the CandyCrew to win the Hackathon?", { "Yes", "Definitely!"})
 ]
 
 sdb = boto3.client('sdb')
@@ -121,7 +121,8 @@ def webhook():
                                 bot.send_message(sender_id, options)
                             elif message_text == "Complete Review":
                                 if "Attributes" in pendingReviewsDb:
-                                    send_message(sender_id, "Thank you for completing the review questionnaire for " + pendingReviewsDb["Attributes"][0]["Name"])
+                                     Thanks for your honest review.  We will ping you when other exclusive offers are available.
+                                    send_message(sender_id, "Thanks for your honest review.  We will ping you when other exclusive offers are available.")
                                     sdb.delete_attributes(
                                         DomainName = domainName,
                                         ItemName = sender_id
