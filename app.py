@@ -123,7 +123,7 @@ def webhook():
                                     DomainName = domainName,
                                     ItemName = sender_id
                                 )
-                                send_message(sender_id, "Thank you for completing the review questionnaire for " + pendingReviewsDb["Attributes"]["Name"])
+                                send_message(sender_id, "Thank you for completing the review questionnaire for " + pendingReviewsDb["Attributes"][0]["Name"])
                             #TODO: if continue, start asking CDVs
                             return "ok", 200
 
