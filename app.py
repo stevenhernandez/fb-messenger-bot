@@ -223,8 +223,10 @@ def solicit_review():
     return "ok", 200
 
 def increment_cdv_counter(sender_id, pendingReviewsDb):
-    pending_review_found = "Attributes" in pendingReviewsDb
-    pending_review_found["Value"] = str(int(pending_review_found["Value"]) + 1)
+    pending_review_found = {
+        "Name":pendingReviewsDb["Attributes"][0]["Name"]
+    }
+    pending_review_found["Value"] = str(int(pendingReviewsDb["Attributes"][0]["Value"]) + 1)
 
     pending_reviews_attributes = []
     pending_reviews_attributes.append(
