@@ -113,7 +113,7 @@ def webhook():
                                     continue
                                 reviewQuestionPlace = int(pendingReviewsDb["Attributes"][0]["Value"])
                                 log("reviewQuestionPlace: " + str(reviewQuestionPlace))
-                                if reviewQuestionPlace > len(cdv):
+                                if reviewQuestionPlace >= len(cdv):
                                     reviewQuestionPlace = 0
                                 options = build_quick_replies_from_dict(
                                     cdv[reviewQuestionPlace][1],
