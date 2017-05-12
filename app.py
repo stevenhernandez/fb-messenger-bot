@@ -193,7 +193,7 @@ def solicit_review():
     )
     sdb.put_attributes(
         DomainName = domainName,
-        ItemName = candy,
+        ItemName = candy.lower(),
         Attributes = [{
             'Name': sender_id,
             'Value': str(0)
