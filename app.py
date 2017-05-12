@@ -102,6 +102,7 @@ def webhook():
                                     "I'm happy to hear you enjoyed your candy! If you'd like to let us know what you thought was GREAT about it, click 'Continue Review'."
                                 )
                                 bot.send_message(sender_id, options)
+                            return "ok", 200
                         elif message_text in newReviewActions:
                             if message_text == "Continue Review":
                                 if "Attributes" not in pendingReviewsDb or "Value" not in pendingReviewsDb["Attributes"][0]:
