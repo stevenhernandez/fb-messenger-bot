@@ -14,13 +14,17 @@ chocolateDict = {
     "Kit Kat",
     "Rollo",
     "Twix",
-    "Hershey"
+    "Hershey",
+    "snickers"
 }
 
 fruityDict = {
     "Starburst",
     "Smarties",
-    "Blow Pops"
+    "Blow Pops",
+    "fruity pebbles",
+    "fruit loops",
+    "jolly rancher"
 }
 
 candyCategory = {
@@ -207,8 +211,8 @@ def send_candy_sample_request(sender_id, message_text, user_info):
 def get_user_info(sender_id):
     url = "https://graph.facebook.com/v2.6/" + sender_id + "?fields=first_name,last_name,profile_pic,locale,timezone,gender&access_token=EAAD0GgditLsBADZAkcimL0Geyg9r9VyGFvCGoVFm5YhNlZCw3fliqbqXZB5lWnNJnGSm5oMLZCZBZCuRSHqHMgyBimmDl09MVZCcOAmnspRxsGYVTqIsleWogSAeaWvQXDcmr7rqlZAW962UgdgEwTNrDaTTqhQHqhas1I3KcYwRxwZDZD"
     info = requests.get(url)
-    log(url)
-    log(info.json())
+    #log(url)
+    #log(info.json())
     return info.json()
 
 def send_quick_reply(recipient_id, options):
@@ -259,13 +263,15 @@ def send_message(recipient_id, message_text):
         log(r.text)
 
 def find_in_db_attributes(response, keyToFind):
-    log("find_in_db_attributes: " + keyToFind)
-    log(response["Attributes"])
+    #log("find_in_db_attributes: " + keyToFind)
+    #log(response["Attributes"])
     for item in response["Attributes"]:
+        log(item)
+        log(keyToFind)
         if item["Name"].lower() == keyToFind.lower():
             return item
-        else:
-            return None
+
+    return None
 
 def send_candy_options(recipient_id, category):
 
@@ -274,15 +280,25 @@ def send_candy_options(recipient_id, category):
         ItemName = 'candy'
     )
     available_candies = {}
+    #log(response)
 
     for candy_name in candyCategory[category]:
-        for db_candy in response["Attributes"]:
-            db_candy_name = response["Attributes"]["Name"]
-            if candy_name.lower() == db_candy_name and int(db_candy["Value"]) > 0:
+        #log(candy_name)
+        #log(category)
+        candy_db_entity = find_in_db_attributes(response, candy_name)
+        #log(candy_db_entity)
+        if candy_db_entity is not None:
+            #log(candy_db_entity)
+            db_candy_name = candy_db_entity["Name"]
+            #log(db_candy_name)
+            #log(candy_name)
+            if candy_name.lower() == db_candy_name.lower() and int(candy_db_entity["Value"]) > 0:
                 available_candies[candy_name] = category
 
+    log(available_candies)
     options = build_quick_replies_from_dict(available_candies, "Which candy would you like to sample?", "https://cdn0.iconfinder.com/data/icons/food-volume-1-4/48/78-512.png")
     log("You should get a message")
+    log(options)
     bot.send_message(recipient_id, options)
 
 def build_quick_replies_from_dict(target_dict, base_level_text, image_url):
@@ -317,8 +333,8 @@ def get_db_item(name, domainName='steven.hernandez'):
                 DomainName = domainName,
                 ItemName = name
             )
-    log("get_attributes response:")
-    log(response)
+    #log("get_attributes response:")
+    #log(response)
     return response
 
 
