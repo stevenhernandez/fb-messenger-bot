@@ -109,7 +109,7 @@ def webhook():
                                 bot.send_message(sender_id, options)
                         elif message_text in newReviewActions:
                             if message_text == "Continue Review":
-                                if "Attributes" not in pendingReviewsDb:
+                                if "Attributes" not in pendingReviewsDb or "Value" not in pendingReviewsDb["Attributes"][0]:
                                     continue
                                 reviewQuestionPlace = int(pendingReviewsDb["Attributes"][0]["Value"])
                                 options = build_quick_replies_from_dict(
