@@ -266,8 +266,6 @@ def find_in_db_attributes(response, keyToFind):
     #log("find_in_db_attributes: " + keyToFind)
     #log(response["Attributes"])
     for item in response["Attributes"]:
-        log(item)
-        log(keyToFind)
         if item["Name"].lower() == keyToFind.lower():
             return item
 
@@ -280,25 +278,18 @@ def send_candy_options(recipient_id, category):
         ItemName = 'candy'
     )
     available_candies = {}
-    #log(response)
 
     for candy_name in candyCategory[category]:
-        #log(candy_name)
-        #log(category)
         candy_db_entity = find_in_db_attributes(response, candy_name)
-        #log(candy_db_entity)
         if candy_db_entity is not None:
-            #log(candy_db_entity)
             db_candy_name = candy_db_entity["Name"]
-            #log(db_candy_name)
-            #log(candy_name)
             if candy_name.lower() == db_candy_name.lower() and int(candy_db_entity["Value"]) > 0:
                 available_candies[candy_name] = category
 
-    log(available_candies)
+    #log(available_candies)
     options = build_quick_replies_from_dict(available_candies, "Which candy would you like to sample?", "https://cdn0.iconfinder.com/data/icons/food-volume-1-4/48/78-512.png")
-    log("You should get a message")
-    log(options)
+    #log("You should get a message")
+    #log(options)
     bot.send_message(recipient_id, options)
 
 def build_quick_replies_from_dict(target_dict, base_level_text, image_url):
