@@ -119,11 +119,12 @@ def webhook():
                                 bot.send_message(sender_id, options)
                                 #TODO: Stuff
                             elif message_text == "Complete Review":
+                                if "Attributes" in pendingReviewsDb:
+                                    send_message(sender_id, "Thank you for completing the review questionnaire for " + pendingReviewsDb["Attributes"][0]["Name"])
                                 sdb.delete_attributes(
                                     DomainName = domainName,
                                     ItemName = sender_id
                                 )
-                                send_message(sender_id, "Thank you for completing the review questionnaire for " + pendingReviewsDb["Attributes"][0]["Name"])
                             #TODO: if continue, start asking CDVs
                             return "ok", 200
 
