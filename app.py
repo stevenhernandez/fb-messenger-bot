@@ -110,11 +110,12 @@ def webhook():
                             if message_text == "Continue Review":
                                 reviewQuestionPlace = int(pendingReviewsDb["Attributes"][0]["Value"])
                                 options = build_quick_replies_from_dict(
-                                    cdv[reviewQuestionPlace][0],
-                                    cdv[reviewQuestionPlace][1]
+                                    cdv[reviewQuestionPlace][1],
+                                    cdv[reviewQuestionPlace][0]
                                 )
-                                log(options)
                                 increment_cdv_counter(sender_id, pendingReviewsDb)
+                                log("Logging options")
+                                log(options)
                                 bot.send_message(sender_id, options)
                                 #TODO: Stuff
                             elif message_text == "Complete Review":
@@ -232,7 +233,8 @@ def increment_cdv_counter(sender_id, pendingReviewsDb):
     pending_reviews_attributes.append(
         {
             'Name': pending_review_found["Name"],
-            'Value': pending_review_found["Value"]
+            'Value': pending_review_found["Value"],
+            'Replace': True
         }
     )
     sdb.put_attributes(
