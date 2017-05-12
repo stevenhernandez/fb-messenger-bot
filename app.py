@@ -93,13 +93,13 @@ def webhook():
                             if starRating < 4:
                                 options = build_quick_replies_from_dict(
                                     newReviewActions,
-                                    "I'm sorry your candy experience was not to your complete satisfaction. If you'd like to tell us how we could improve, click 'Continue Review'."
+                                    "I'm sorry your candy experience was not to your complete satisfaction. If you'd like to tell us how we could improve, click 'Continue Review' or just type what you'd like."
                                 )
                                 bot.send_message(sender_id, options)
                             else:
                                 options = build_quick_replies_from_dict(
                                     newReviewActions,
-                                    "I'm happy to hear you enjoyed your candy! If you'd like to let us know what you thought was GREAT about it, click 'Continue Review'."
+                                    "I'm happy to hear you enjoyed your candy! If you'd like to let us know what you thought was GREAT about it, click 'Continue Review' or just type what you'd like."
                                 )
                                 bot.send_message(sender_id, options)
                             return "ok", 200
@@ -119,15 +119,13 @@ def webhook():
                                 log("Logging options")
                                 log(options)
                                 bot.send_message(sender_id, options)
-                                #TODO: Stuff
                             elif message_text == "Complete Review":
                                 if "Attributes" in pendingReviewsDb:
                                     send_message(sender_id, "Thank you for completing the review questionnaire for " + pendingReviewsDb["Attributes"][0]["Name"])
-                                sdb.delete_attributes(
-                                    DomainName = domainName,
-                                    ItemName = sender_id
-                                )
-                            #TODO: if continue, start asking CDVs
+                                    sdb.delete_attributes(
+                                        DomainName = domainName,
+                                        ItemName = sender_id
+                                    )
                             return "ok", 200
 
 
@@ -144,10 +142,20 @@ def webhook():
                             send_candy_sample_request(sender_id, message_text, user_info)
                             send_message(sender_id, "Thank you for choosing to sample " + message_text + ". Be prepared for freaky fast (but leagally distinct) delivery.\nNo need to provide your address https://i.imgflip.com/1ou13m.jpg")
                         elif pending_review_found:
-                            options = build_quick_replies_from_dict(
-                                newReviewActions,
-                                "Thanks, we will include that with your previous responses!"
-                            )
+                            if "Attributes" not in pendingReviewsDb or "Value" not in pendingReviewsDb["Attributes"][0]:
+                                continue
+                            reviewQuestionPlace = int(pendingReviewsDb["Attributes"][0]["Value"])
+                            log("reviewQuestionPlace: " + str(reviewQuestionPlace))
+                            if reviewQuestionPlace >= len(cdv):
+                                options = build_quick_replies_from_dict(
+                                    ongoingReviewActions,
+                                    "Thanks, we will include that with your responses!"
+                                )
+                            else:
+                                options = build_quick_replies_from_dict(
+                                    newReviewActions,
+                                    "Thanks, we will include that with your responses!"
+                                )
                             bot.send_message(sender_id, options)
                             return "ok", 200
                         else:
