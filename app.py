@@ -112,6 +112,9 @@ def webhook():
                                 if "Attributes" not in pendingReviewsDb or "Value" not in pendingReviewsDb["Attributes"][0]:
                                     continue
                                 reviewQuestionPlace = int(pendingReviewsDb["Attributes"][0]["Value"])
+                                log("reviewQuestionPlace: " + reviewQuestionPlace)
+                                if reviewQuestionPlace > len(cdv):
+                                    reviewQuestionPlace = 0
                                 options = build_quick_replies_from_dict(
                                     cdv[reviewQuestionPlace][1],
                                     cdv[reviewQuestionPlace][0]
