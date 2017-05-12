@@ -140,7 +140,7 @@ def webhook():
                             decrement_candies(candy, candyDb, num_available_candies, response)
                             user_info = get_user_info(sender_id)
                             send_candy_sample_request(sender_id, message_text, user_info)
-                            send_message(sender_id, "Thank you for choosing to sample " + message_text + ". Be prepared for freaky fast (but leagally distinct) delivery.\nNo need to provide your address https://i.imgflip.com/1ou13m.jpg")
+                            send_message(sender_id, "Thanks for choosing your candy.  Your candy is en route for delivery.")
                         elif pending_review_found:
                             if "Attributes" not in pendingReviewsDb or "Value" not in pendingReviewsDb["Attributes"][0]:
                                 continue
