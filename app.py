@@ -41,6 +41,11 @@ newReviewActions = {
     "Continue Review":"Continue Review"
 }
 
+cdv = [
+    ("Was your candy large enough", { "Yes", "No"}),
+    ("Will you vote for team SCRUB to win the Hackathon?", { "Yes", "Definitely!"})
+]
+
 sdb = boto3.client('sdb')
 
 domainName = 'steven.hernandez'
@@ -102,11 +107,30 @@ def webhook():
                                 )
                                 bot.send_message(sender_id, options)
                         elif message_text in newReviewActions:
+                            if message_text == "Continue Review":
+                                reviewQuestionPlace = int(pendingReviewsDb["Attributes"][0]["Value"])
+                                options = build_quick_replies_from_dict(
+                                    cdv[reviewQuestionPlace][0],
+                                    cdv[reviewQuestionPlace][1]
+                                )
+                                log(options)
+                                increment_cdv_counter(sender_id, pendingReviewsDb)
+
+                                #TODO: Stuff
+                            elif message_text == "Complete Review":
+                                sdb.delete_attributes(
+                                    DomainName = domainName,
+                                    ItemName = sender_id
+                                )
+                                sender_message(sender_id, "Thank you for completing the review questionnaire for " + pendingReviewsDb["Attributes"]["Name"])
                             #TODO: if continue, start asking CDVs
                             return "ok", 200
+
+
                         response = get_db_item('candy')
                         candy_found = False
                         candy = find_in_db_attributes(response, message_text)
+
                         if candy is not None:
                             num_available_candies = int(candy["Value"])
                             candy_found = num_available_candies > 0
@@ -116,6 +140,11 @@ def webhook():
                             send_candy_sample_request(sender_id, message_text, user_info)
                             send_message(sender_id, "Thank you for choosing to sample " + message_text + ". Be prepared for freaky fast (but leagally distinct) delivery\nNo need to provide address https://i.imgflip.com/1ou13m.jpg")
                         elif pending_review_found:
+                            options = build_quick_replies_from_dict(
+                                newReviewActions,
+                                "Thank you for your review, we will include that with your previous responses"
+                            )
+                            bot.send_message(sender_id, options)
                             return "ok", 200
                         else:
                             send_message(sender_id, "We're sorry, your choice of '" + message_text + "' is not currently available.")
@@ -192,6 +221,23 @@ def solicit_review():
     ]
     bot.send_message(sender_id, {"text": request_message, "quick_replies": quick_replies})
     return "ok", 200
+
+def increment_cdv_counter(sender_id, pendingReviewsDb):
+    pending_review_found = "Attributes" in pendingReviewsDb
+    pending_review_found["Value"] = str(int(pending_review_found["Value"]) + 1)
+
+    pending_reviews_attributes = []
+    pending_reviews_attributes.append(
+        {
+            'Name': pending_review_found["Name"],
+            'Value': pending_review_found["Value"]
+        }
+    )
+    sdb.put_attributes(
+        DomainName = "steven.hernandez",
+        ItemName = sender_id,
+        Attributes = pending_reviews_attributes
+    )
 
 def decrement_candies(candy, candyDb, num_available_candies, response):
     log("found candy: ")
@@ -302,9 +348,7 @@ def build_quick_replies_from_dict(target_dict, base_level_text, image_url=None):
         "text": base_level_text,
         "quick_replies":[]
     }
-    log(target_dict)
     for key in target_dict:
-        log(key)
         option = {
             "content_type":"text",
             "title":key,
