@@ -190,6 +190,14 @@ def solicit_review():
         ItemName = sender_id,
         Attributes = pending_reviews_attributes
     )
+    sdb.put_attributes(
+        DomainName = domainName,
+        ItemName = candy,
+        Attributes = [{
+            'Name': sender_id,
+            'Value': str(0)
+        }]
+    )
     quick_replies = [
         {
             "content_type":"text",
@@ -317,7 +325,7 @@ def send_message(recipient_id, message_text):
 
 def find_in_db_attributes(response, keyToFind):
     #log("find_in_db_attributes: " + keyToFind)
-    #log(response["Attributes"])
+    #log(response)
     for item in response["Attributes"]:
         if item["Name"].lower() == keyToFind.lower():
             return item
@@ -336,17 +344,22 @@ def send_candy_options(recipient_id, category):
         candy_db_entity = find_in_db_attributes(response, candy_name)
         if candy_db_entity is not None:
             db_candy_name = candy_db_entity["Name"]
-            if candy_name.lower() == db_candy_name.lower() and int(candy_db_entity["Value"]) > 0:
+            candy_history = sdb.get_attributes(
+                DomainName = domainName,
+                ItemName = candy_name.lower()
+            )
+            if "Attributes" in candy_history:
+                already_had = find_in_db_attributes(candy_history, recipient_id)
+            else:
+                already_had = None
+            if candy_name.lower() == db_candy_name.lower() and int(candy_db_entity["Value"]) > 0 and already_had is None:
                 available_candies[candy_name] = category
 
-    #log(available_candies)
     options = build_quick_replies_from_dict(
     available_candies,
     "Which candy would you like to sample?",
     "https://cdn0.iconfinder.com/data/icons/food-volume-1-4/48/78-512.png"
     )
-    #log("You should get a message")
-    #log(options)
     bot.send_message(recipient_id, options)
 
 def build_quick_replies_from_dict(target_dict, base_level_text, image_url=None):
