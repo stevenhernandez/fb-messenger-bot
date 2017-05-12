@@ -115,7 +115,7 @@ def webhook():
                                 )
                                 log(options)
                                 increment_cdv_counter(sender_id, pendingReviewsDb)
-
+                                bot.send_message(sender_id, options)
                                 #TODO: Stuff
                             elif message_text == "Complete Review":
                                 sdb.delete_attributes(
