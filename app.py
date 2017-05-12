@@ -13,18 +13,13 @@ bot = Bot("EAAD0GgditLsBAEOaCmRSpSHZCcer6BsGNizdj0KPiodpsNWK1a76s9GBDfiUk5uPVWKq
 chocolateDict = {
     "Kit Kat",
     "Rollo",
-    "Twix",
-    "Hershey",
-    "snickers"
+    "Twix"
 }
 
 fruityDict = {
     "Starburst",
     "Smarties",
-    "Blow Pops",
-    "fruity pebbles",
-    "fruit loops",
-    "jolly rancher"
+    "Blow Pops"
 }
 
 candyCategory = {
